@@ -1,5 +1,8 @@
 # LCR-Rot-hop-ont++
 
+Source code for Injecting Knowledge from a Domain Sentiment Ontology in a Neural Approach for Aspect-Based Sentiment
+Classification.
+
 ## Installation
 
 ### Data
