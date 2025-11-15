@@ -227,8 +227,8 @@ if __name__ == "__main__":
         required=False,
         help="The number of hops to use in the validation phase",
     )
-    parser.add_argument("--epochs", default=20, type=int, help="The number of epochs")
-    parser.add_argument("--trials", default=50, type=int, help="The number of trials")
+    parser.add_argument("--epochs", default=10, type=int, help="The number of epochs")
+    parser.add_argument("--trials", default=40, type=int, help="The number of trials")
 
     args = parser.parse_args()
 
