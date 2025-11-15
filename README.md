@@ -3,7 +3,7 @@
 Source code for Injecting Knowledge from a Domain Sentiment Ontology in a Neural Approach for Aspect-Based Sentiment
 Classification.
 
-## Installation
+## Getting started
 
 ### Data
 
@@ -19,16 +19,23 @@ rename the SemEval datasets to end up with the following files:
   - `ABSA16_Restaurants_Train.xml`
   - `ontology.owl-Extended.owl`
 
-### Setup environment
+### Installing packages in a virtual environment
 
-Create a conda environment with Python version 3.10, the required packages and their versions are listed
-in `requirements.txt`, note that you may need to install some packages using `conda install` instead of `pip install`
-depending on your platform.
+This project uses `uv` to manage its dependencies. [Install uv](https://docs.astral.sh/uv/getting-started/installation/) on your local machine. Clone this repository to your local machine, and open a terminal window in this repository. Create a virtual environment using:
 
-## Usage
+```
+uv venv --python 3.11
+```
 
-To view the available cli args for a program, run `python -m [ENTRYPOINT] --help`. These CLI args can for example be used to pick
-the year of the dataset.
+Then, install packages using
+
+```
+uv sync
+```
+
+### Running scripts
+
+All entrypoints are located in the `src/entrypoints` directory. Each entrypoint accepts CLI arguments. To view the available cli args for a program, run `python -m [ENTRYPOINT] --help`. These CLI args can for example be used to pick the year of the dataset.
 
 - `preprocess.py`: remove opinions that contain implicit targets and generate embeddings, these embeddings are used
   by the other programs. To generate all embeddings for a given year, run `python -m src.entrypoints.preprocess --all`
@@ -39,7 +46,7 @@ the year of the dataset.
 
 ## Acknowledgements
 
-The `model.bert_encoder` module uses code from:
+The `src.model.bert_encoder` module uses code from:
 
 - Liu, W., Zhou, P., Zhao, Z., Wang, Z., Ju, Q., Deng, H., Wang, P.: K-BERT: Enabling language representation with
   knowledge graph. In: 34th AAAI Conference on Artificial Intelligence. vol. 34, pp. 2901–2908. AAAI Press (2020)
