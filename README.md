@@ -56,8 +56,8 @@ python -m src.entrypoints.hyperparam --year 2015
 python -m src.entrypoints.hyperparam --year 2015 --val-ont-hops 1
 # The best params for each configuration can be found in the results directory, please edit the training process accordingly
 python -m src.entrypoints.train --year 2015 # Add ont-hops arguments if you want
-python -m src.entrypoints.validate --year 2015
-python -m src.entrypoints.validate --year 2015 --ablation
+python -m src.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH
+python -m src.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH --ablation
 ```
 
 ## Acknowledgements
