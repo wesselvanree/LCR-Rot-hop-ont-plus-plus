@@ -127,7 +127,7 @@ def main():
     group.add_argument(
         "--checkpoint",
         type=str,
-        help="Path to a checkpoint dir from main_hyperparam.py",
+        help="Path to a checkpoint dir from hyperparam.py",
     )
 
     args = parser.parse_args()

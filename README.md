@@ -13,11 +13,11 @@ datasets, and the [ontology](https://github.com/KSchouten/Heracles/tree/master/s
 rename the SemEval datasets to end up with the following files:
 
 - `data/raw`
-    - `ABSA15_Restaurants_Test.xml`
-    - `ABSA15_Restaurants_Train.xml`
-    - `ABSA16_Restaurants_Test.xml`
-    - `ABSA16_Restaurants_Train.xml`
-    - `ontology.owl-Extended.owl`
+  - `ABSA15_Restaurants_Test.xml`
+  - `ABSA15_Restaurants_Train.xml`
+  - `ABSA16_Restaurants_Test.xml`
+  - `ABSA16_Restaurants_Train.xml`
+  - `ontology.owl-Extended.owl`
 
 ### Setup environment
 
@@ -27,14 +27,14 @@ depending on your platform.
 
 ## Usage
 
-To view the available cli args for a program, run `python [FILE] --help`. These CLI args can for example be used to pick
+To view the available cli args for a program, run `python -m [ENTRYPOINT] --help`. These CLI args can for example be used to pick
 the year of the dataset.
 
-- `main_preprocess.py`: remove opinions that contain implicit targets and generate embeddings, these embeddings are used
-  by the other programs. To generate all embeddings for a given year, run `python main_preprocess.py --all`
-- `main_hyperparam.py`: run hyperparameter optimization
-- `main_train.py`: train the model for a given set of hyperparameters
-- `main_validate.py`: validate a trained model. To do an ablation experiment, run `python main_validate.py --ablation`,
+- `preprocess.py`: remove opinions that contain implicit targets and generate embeddings, these embeddings are used
+  by the other programs. To generate all embeddings for a given year, run `python -m src.entrypoints.preprocess --all`
+- `hyperparam.py`: run hyperparameter optimization
+- `train.py`: train the model for a given set of hyperparameters
+- `validate.py`: validate a trained model. To do an ablation experiment, run `python -m src.entrypoints.validate --ablation`,
   this requires all embeddings to be created for a given year.
 
 ## Acknowledgements
@@ -43,4 +43,4 @@ The `model.bert_encoder` module uses code from:
 
 - Liu, W., Zhou, P., Zhao, Z., Wang, Z., Ju, Q., Deng, H., Wang, P.: K-BERT: Enabling language representation with
   knowledge graph. In: 34th AAAI Conference on Artificial Intelligence. vol. 34, pp. 2901–2908. AAAI Press (2020)
-- https://github.com/Felix0161/KnowledgeEnhancedABSA 
+- https://github.com/Felix0161/KnowledgeEnhancedABSA
