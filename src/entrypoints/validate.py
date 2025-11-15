@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 from tqdm import tqdm
 
 from src.model import LCRRotHopPlusPlus
-from src.utils import EmbeddingsDataset, CSVWriter
+from src.utils import CSVWriter, EmbeddingsDataset
 
 
 def validate_model(
@@ -120,14 +120,8 @@ def main():
         action=argparse.BooleanOptionalAction,
         help="Run an ablation experiment, this requires all embeddings to exist for a given year.",
     )
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    model = parser.add_argument(
         "--model", type=str, help="Path to a state_dict of the LCRRotHopPlusPlus model"
-    )
-    group.add_argument(
-        "--checkpoint",
-        type=str,
-        help="Path to a checkpoint dir from hyperparam.py",
     )
 
     args = parser.parse_args()
@@ -146,16 +140,8 @@ def main():
         else "mps" if torch.backends.mps.is_available() else "cpu"
     )
     model = LCRRotHopPlusPlus(gamma=gamma, hops=hops).to(device)
-
-    if args.model is not None:
-        state_dict = torch.load(args.model, map_location=device)
-        model.load_state_dict(state_dict)
-    elif args.checkpoint is not None:
-        state_dict, _ = torch.load(
-            os.path.join(args.checkpoint, "state_dict.pt"), map_location=device
-        )
-        model.load_state_dict(state_dict)
-
+    state_dict = torch.load(args.model, map_location=device)
+    model.load_state_dict(state_dict)
     model.eval()
 
     if not run_ablation:
