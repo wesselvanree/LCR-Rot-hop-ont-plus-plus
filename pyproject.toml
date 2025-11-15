@@ -3,7 +3,7 @@ name = "lcr-rot-hop-ont-plus-plus"
 version = "0.1.0"
 description = "Injecting Knowledge from a Domain Sentiment Ontology in a Neural Approach for Aspect-Based Sentiment Classification."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.12"
 dependencies = [
     "datasets>=2.10.1,<3.0.0",
     "hyperopt>=0.2.7,<1.0.0",
