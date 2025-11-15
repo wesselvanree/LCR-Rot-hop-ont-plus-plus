@@ -47,6 +47,19 @@ All entrypoints are located in the `src/entrypoints` directory. Each entrypoint 
 - `validate.py`: validate a trained model. To do an ablation experiment, run `python -m src.entrypoints.validate --ablation`,
   this requires all embeddings to be created for a given year.
 
+Thus, you might execute these commands:
+
+```shell
+python -m src.entrypoints.preprocess --year 2015 --all
+python -m src.entrypoints.preprocess --year 2015 --phase Train --ont-hops 1
+python -m src.entrypoints.hyperparam --year 2015
+python -m src.entrypoints.hyperparam --year 2015 --val-ont-hops 1
+# The best params for each configuration can be found in the results directory, please edit the training process accordingly
+python -m src.entrypoints.train --year 2015 # Add ont-hops arguments if you want
+python -m src.entrypoints.validate --year 2015
+python -m src.entrypoints.validate --year 2015 --ablation
+```
+
 ## Acknowledgements
 
 The `src.model.bert_encoder` module uses code from:
