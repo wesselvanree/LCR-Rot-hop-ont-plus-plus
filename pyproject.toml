@@ -1,7 +1,7 @@
 [project]
 name = "lcr-rot-hop-ont-plus-plus"
 version = "0.1.0"
-description = "Add your description here"
+description = "Injecting Knowledge from a Domain Sentiment Ontology in a Neural Approach for Aspect-Based Sentiment Classification."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
