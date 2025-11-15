@@ -3,12 +3,13 @@ import os
 from typing import Optional
 
 import torch
-from torch import optim, nn
+from torch import nn, optim
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 
 from src.model import LCRRotHopPlusPlus
 from src.utils import EmbeddingsDataset, train_validation_split
+from src.utils.torch import get_torch_device
 
 
 def stringify_float(value: float):
@@ -58,11 +59,7 @@ def main():
     n_epochs = 100
     batch_size = 32
 
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
-    )
+    device = get_torch_device()
 
     # create training anf validation DataLoader
     train_dataset = EmbeddingsDataset(
@@ -186,6 +183,9 @@ def main():
                 best_state_dict = model.state_dict()
     except KeyboardInterrupt:
         print("Interrupted training procedure, saving best model...")
+
+    if best_accuracy is None:
+        best_accuracy = 0.0
 
     if best_state_dict is not None:
         models_dir = os.path.join("data", "models")

@@ -13,6 +13,7 @@ from ulid import ulid
 from src.model import LCRRotHopPlusPlus
 from src.utils import EmbeddingsDataset, train_validation_split
 from src.utils.paths import Paths
+from src.utils.torch import get_torch_device
 
 
 class Objective:
@@ -180,13 +181,7 @@ class Objective:
 
 
 def main(year: int, n_epochs: int, n_trials: int, val_ont_hops: Optional[int]):
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "cpu"
-        # else "mps" if torch.backends.mps.is_available() else "cpu"
-        # ^ You can toggle between the lines above. For me, mps is slower than cpu
-    )
+    device = get_torch_device()
 
     study = optuna.create_study(
         study_name=f"params{year}_t{n_trials}_e{n_epochs}_{ulid()}",  # NOTE: ULIDs are sortable

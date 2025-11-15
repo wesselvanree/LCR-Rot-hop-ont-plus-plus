@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 from src.model import LCRRotHopPlusPlus
 from src.utils import CSVWriter, EmbeddingsDataset
+from src.utils.torch import get_torch_device
 
 
 def validate_model(
@@ -134,11 +135,7 @@ def main():
     use_soft_pos: bool = args.sp
     run_ablation: bool = args.ablation
 
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
-    )
+    device = get_torch_device()
     model = LCRRotHopPlusPlus(gamma=gamma, hops=hops).to(device)
     state_dict = torch.load(args.model, map_location=device)
     model.load_state_dict(state_dict)

@@ -1,14 +1,16 @@
 import argparse
 import os
+from pathlib import Path
 from typing import Optional
-import xml.etree.ElementTree as ElementTree
+from xml.etree.ElementTree import Element, ElementTree, parse
 
 import torch
 from rdflib import Graph
 from tqdm import tqdm
 
 from src.model import EmbeddingsLayer
-from src.utils import download_from_url, EmbeddingsDataset
+from src.utils import EmbeddingsDataset, download_from_url
+from src.utils.torch import get_torch_device
 
 
 def clean_data(year: int, phase: str):
@@ -20,9 +22,9 @@ def clean_data(year: int, phase: str):
 
     if os.path.isfile(output_path):
         print(f"Found cleaned file at {output_path}")
-        return ElementTree.parse(output_path)
+        return parse(output_path)
 
-    tree = ElementTree.parse(input_path)
+    tree = parse(input_path)
 
     # remove implicit targets
     n_null_removed = 0
@@ -64,7 +66,9 @@ def clean_data(year: int, phase: str):
 
 
 def generate_embeddings(
-    embeddings_layer: EmbeddingsLayer, data: ElementTree, embeddings_dir: str
+    embeddings_layer: EmbeddingsLayer,
+    data: ElementTree[Element[str]],
+    embeddings_dir: str | Path,
 ):
     os.makedirs(embeddings_dir, exist_ok=True)
     print(f"\nGenerating embeddings into {embeddings_dir}")
@@ -94,13 +98,15 @@ def generate_embeddings(
                 embeddings, target_pos, hops = embeddings_layer.forward(
                     sentence, target_from, target_to
                 )
-                data = {
-                    "label": label,
-                    "embeddings": embeddings,
-                    "target_pos": target_pos,
-                    "hops": hops,
-                }
-                torch.save(data, f"{embeddings_dir}/{i}.pt")
+                torch.save(
+                    {
+                        "label": label,
+                        "embeddings": embeddings,
+                        "target_pos": target_pos,
+                        "hops": hops,
+                    },
+                    f"{embeddings_dir}/{i}.pt",
+                )
                 i += 1
 
         print(f"Generated embeddings for {i} opinions")
@@ -167,11 +173,7 @@ def main():
             "The visible matrix and soft positions have no effect without hops in the ontology"
         )
 
-    device = torch.device(
-        "cuda"
-        if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
-    )
+    device = get_torch_device()
     torch.set_default_device(device)
 
     # generate embeddings only for selected options
