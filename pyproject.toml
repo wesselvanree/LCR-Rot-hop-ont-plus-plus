@@ -6,13 +6,13 @@ readme = "README.md"
 requires-python = ">=3.11,<3.12"
 dependencies = [
     "datasets>=2.10.1,<3.0.0",
-    "hyperopt>=0.2.7,<1.0.0",
     "matplotlib>=3.7.1,<4.0.0",
+    "optuna>=4.6.0,<5",
     "rdflib>=6.3.1,<7.0.0",
     "requests>=2.28.2,<3.0.0",
     "scikit-learn>=1.2.2,<2.0.0",
-    "setuptools>=80.9.0,<81.0.0", # hyperopt uses pkg_resources, which is deprecated
     "torch>=2.0.0,<3.0.0",
     "tqdm>=4.65.0,<5.0.0",
     "transformers>=4.27.1,<5.0.0",
+    "ulid>=1.1,<2",
 ]

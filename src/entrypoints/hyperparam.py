@@ -1,93 +1,53 @@
 import argparse
 import json
 import os
-import pickle
 from typing import Optional
 
+import optuna
 import torch
-from hyperopt import hp, tpe, fmin, Trials, STATUS_OK
 from torch import nn, optim
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
+from ulid import ulid
 
 from src.model import LCRRotHopPlusPlus
 from src.utils import EmbeddingsDataset, train_validation_split
+from src.utils.paths import Paths
 
 
-class HyperOptManager:
-    """A class that performs hyperparameter optimization and stores the best states as checkpoints."""
-
-    def __init__(self, year: int, val_ont_hops: Optional[int]):
+class Objective:
+    def __init__(
+        self,
+        year: int,
+        val_ont_hops: Optional[int],
+        n_epochs: int,
+        device: torch.device,
+    ):
         self.year = year
-        self.n_epochs = 20
+        self.device = device
         self.val_ont_hops = val_ont_hops
+        self.n_epochs = n_epochs
 
-        self.eval_num = 0
-        self.best_loss = None
-        self.best_hyperparams = None
-        self.best_state_dict = None
-        self.trials = Trials()
+    def objective(self, trial: optuna.Trial) -> float:
+        tqdm.write("Running objective...")
 
-        self.device = torch.device(
-            "cuda"
-            if torch.cuda.is_available()
-            else "mps" if torch.backends.mps.is_available() else "cpu"
+        learning_rate: float = trial.suggest_categorical(
+            "learning_rate", [0.02, 0.05, 0.06, 0.07, 0.08, 0.09, 0.01, 0.1]
         )
-
-        # read checkpoint if exists
-        self.__checkpoint_dir = f"data/checkpoints/{year}_epochs{self.n_epochs}"
-
-        if os.path.isdir(self.__checkpoint_dir):
-            try:
-                self.best_state_dict = torch.load(
-                    f"{self.__checkpoint_dir}/state_dict.pt"
-                )
-                with open(f"{self.__checkpoint_dir}/hyperparams.json", "r") as f:
-                    self.best_hyperparams = json.load(f)
-                with open(f"{self.__checkpoint_dir}/trials.pkl", "rb") as f:
-                    self.trials = pickle.load(f)
-                    self.eval_num = len(self.trials)
-                with open(f"{self.__checkpoint_dir}/loss.txt", "r") as f:
-                    self.best_loss = float(f.read())
-
-                print(
-                    f"Resuming from previous checkpoint {self.__checkpoint_dir} with best loss {self.best_loss}"
-                )
-            except IOError:
-                raise ValueError(
-                    f"Checkpoint {self.__checkpoint_dir} is incomplete, please remove this directory"
-                )
-        else:
-            print("Starting from scratch")
-
-    def run(self):
-        # TODO: convert to dict for better readability in json file?
-        space = [
-            hp.choice("learning_rate", [0.02, 0.05, 0.06, 0.07, 0.08, 0.09, 0.01, 0.1]),
-            hp.quniform("dropout_rate", 0.25, 0.75, 0.1),
-            hp.choice("momentum", [0.85, 0.9, 0.95, 0.99]),
-            hp.choice("weight_decay", [0.00001, 0.0001, 0.001, 0.01, 0.1]),
-            hp.choice("lcr_hops", [2, 3, 4, 8]),
-        ]
-
-        best = fmin(
-            self.objective,
-            space=space,
-            algo=tpe.suggest,
-            trials=self.trials,
-            show_progressbar=False,
+        dropout_rate: float = trial.suggest_float(
+            "dropout_rate", low=0.25, high=0.75, step=0.1
         )
-
-    def objective(self, hyperparams):
-        self.eval_num += 1
-        learning_rate, dropout_rate, momentum, weight_decay, lcr_hops = hyperparams
-        print(f"\n\nEval {self.eval_num} with hyperparams {hyperparams}")
+        momentum: float = trial.suggest_categorical("momentum", [0.85, 0.9, 0.95, 0.99])
+        weight_decay: float = trial.suggest_categorical(
+            "weight_decay", [0.00001, 0.0001, 0.001, 0.01, 0.1]
+        )
+        lcr_hops: int = trial.suggest_categorical("lcr_hops", [2, 3, 4, 8])
 
         # create training and validation DataLoader
         train_dataset = EmbeddingsDataset(
             year=self.year, device=self.device, phase="Train"
         )
-        print(f"Using {train_dataset} with {len(train_dataset)} obs for training")
+        tqdm.write(f"Using {train_dataset} with {len(train_dataset)} obs for training")
         train_idx, validation_idx = train_validation_split(train_dataset)
 
         training_subset = Subset(train_dataset, train_idx)
@@ -101,12 +61,12 @@ class HyperOptManager:
                 ont_hops=self.val_ont_hops,
             )
             validation_subset = Subset(train_val_dataset, validation_idx)
-            print(
+            tqdm.write(
                 f"Using {train_val_dataset} with {len(validation_subset)} obs for validation"
             )
         else:
             validation_subset = Subset(train_dataset, validation_idx)
-            print(
+            tqdm.write(
                 f"Using {train_dataset} with {len(validation_subset)} obs for validation"
             )
         training_loader = DataLoader(
@@ -198,12 +158,13 @@ class HyperOptManager:
                     val_steps += 1
 
                     epoch_progress.set_description(
-                        f"Test Loss: {val_loss / val_steps:.3f}, Test Acc.: {val_n_correct / val_n:.3f}"
+                        f"Val Loss: {val_loss / val_steps:.3f}, Val Acc.: {val_n_correct / val_n:.3f}"
                     )
 
                 torch.set_default_device("cpu")
 
             validation_accuracy = val_n_correct / val_n
+            tqdm.write(f"Validation accuracy: {validation_accuracy:.3f}")
 
             if best_accuracy is None or validation_accuracy > best_accuracy:
                 epochs_progress.set_description(
@@ -212,44 +173,47 @@ class HyperOptManager:
                 best_accuracy = validation_accuracy
                 best_state_dict = (model.state_dict(), optimizer.state_dict())
 
-        # we want to maximize accuracy, which is equivalent to minimizing -accuracy
-        objective_loss = -best_accuracy
-        self.check_best_loss(objective_loss, hyperparams, best_state_dict)
+        if best_accuracy is None:
+            best_accuracy = 0.0
 
-        return {
-            "loss": loss,
-            "status": STATUS_OK,
-            "space": hyperparams,
-        }
-
-    def check_best_loss(self, loss: float, hyperparams, state_dict: tuple[dict, dict]):
-        if self.best_loss is None or loss < self.best_loss:
-            self.best_loss = loss
-            self.best_hyperparams = hyperparams
-            self.best_state_dict = state_dict
-
-            os.makedirs(self.__checkpoint_dir, exist_ok=True)
-
-            torch.save(state_dict, f"{self.__checkpoint_dir}/state_dict.pt")
-            with open(f"{self.__checkpoint_dir}/hyperparams.json", "w") as f:
-                json.dump(hyperparams, f)
-            with open(f"{self.__checkpoint_dir}/loss.txt", "w") as f:
-                f.write(str(self.best_loss))
-            print(
-                f"Best checkpoint with loss {self.best_loss} and hyperparameters {self.best_hyperparams} saved to {self.__checkpoint_dir}"
-            )
-
-        with open(f"{self.__checkpoint_dir}/trials.pkl", "wb") as f:
-            pickle.dump(self.trials, f)
+        return best_accuracy
 
 
-def main(year: int, val_ont_hops: Optional[int]):
-    opt = HyperOptManager(year=year, val_ont_hops=val_ont_hops)
-    opt.run()
+def main(year: int, n_epochs: int, n_trials: int, val_ont_hops: Optional[int]):
+    device = torch.device(
+        "cuda"
+        if torch.cuda.is_available()
+        else "cpu"
+        # else "mps" if torch.backends.mps.is_available() else "cpu"
+        # ^ You can toggle between the lines above. For me, mps is slower than cpu
+    )
+
+    study = optuna.create_study(
+        study_name=f"params{year}_t{n_trials}_e{n_epochs}_{ulid()}",  # NOTE: ULIDs are sortable
+        direction="maximize",  # We maximize the accuracy
+    )
+    study.optimize(
+        Objective(
+            year=year, val_ont_hops=val_ont_hops, n_epochs=n_epochs, device=device
+        ).objective,
+        n_trials=n_trials,
+        show_progress_bar=True,
+    )
+
+    hyperparams_dir = Paths.repo_root / "results" / study.study_name
+    os.makedirs(hyperparams_dir, exist_ok=True)
+
+    with open(hyperparams_dir / "best_value.txt", "w") as f:
+        f.write(str(study.best_value))
+    with open(hyperparams_dir / "best_params.json", "w") as f:
+        json.dump(study.best_params, f)
+
+    print(
+        f"Saved best trial with objective {study.best_value} and hyperparameters {study.best_params} to {hyperparams_dir}"
+    )
 
 
 if __name__ == "__main__":
-    # parse CLI args
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
@@ -263,6 +227,14 @@ if __name__ == "__main__":
         required=False,
         help="The number of hops to use in the validation phase",
     )
+    parser.add_argument("--epochs", default=20, type=int, help="The number of epochs")
+    parser.add_argument("--trials", default=50, type=int, help="The number of trials")
+
     args = parser.parse_args()
 
-    main(year=args.year, val_ont_hops=args.val_ont_hops)
+    main(
+        year=args.year,
+        val_ont_hops=args.val_ont_hops,
+        n_trials=args.trials,
+        n_epochs=args.epochs,
+    )
