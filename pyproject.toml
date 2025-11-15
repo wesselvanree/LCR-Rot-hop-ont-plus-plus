@@ -1,0 +1,17 @@
+[project]
+name = "lcr-rot-hop-ont-plus-plus"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "datasets==2.10.1",
+    "hyperopt==0.2.7",
+    "matplotlib==3.7.1",
+    "rdflib==6.3.1",
+    "requests==2.28.2",
+    "scikit-learn==1.2.2",
+    "torch==2.0.0",
+    "tqdm==4.65.0",
+    "transformers==4.27.1",
+]
