@@ -3,6 +3,9 @@
 Source code for Injecting Knowledge from a Domain Sentiment Ontology in a Neural Approach for Aspect-Based Sentiment
 Classification.
 
+> [!NOTE]
+> Looking for the initial release (2023)? View the [initial release branch](https://github.com/wesselvanree/LCR-Rot-hop-ont-plus-plus/tree/initial-release).
+
 ## Getting started
 
 ### Data
