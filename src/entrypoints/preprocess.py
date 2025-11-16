@@ -10,6 +10,7 @@ from tqdm import tqdm
 
 from src.model import EmbeddingsLayer
 from src.utils import EmbeddingsDataset, download_from_url
+from src.utils.paths import Paths
 from src.utils.torch import get_torch_device
 
 
@@ -17,8 +18,8 @@ def clean_data(year: int, phase: str):
     """Clean a SemEval dataset by removing opinions with implicit targets. This function returns the cleaned dataset."""
     filename = f"ABSA{year % 2000}_Restaurants_{phase}.xml"
 
-    input_path = f"data/raw/{filename}"
-    output_path = f"data/processed/{filename}"
+    input_path = Paths.data_raw / filename
+    output_path = Paths.data_processed / filename
 
     if os.path.isfile(output_path):
         print(f"Found cleaned file at {output_path}")
@@ -67,7 +68,7 @@ def clean_data(year: int, phase: str):
 
 def generate_embeddings(
     embeddings_layer: EmbeddingsLayer,
-    data: ElementTree[Element[str]],
+    data: ElementTree,
     embeddings_dir: str | Path,
 ):
     os.makedirs(embeddings_dir, exist_ok=True)

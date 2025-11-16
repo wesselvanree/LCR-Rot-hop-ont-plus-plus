@@ -9,6 +9,7 @@ from tqdm import tqdm
 
 from src.model import LCRRotHopPlusPlus
 from src.utils import EmbeddingsDataset, train_validation_split
+from src.utils.paths import Paths
 from src.utils.torch import get_torch_device
 
 
@@ -188,7 +189,7 @@ def main():
         best_accuracy = 0.0
 
     if best_state_dict is not None:
-        models_dir = os.path.join("data", "models")
+        models_dir = Paths.models
         os.makedirs(models_dir, exist_ok=True)
         model_path = os.path.join(
             models_dir,

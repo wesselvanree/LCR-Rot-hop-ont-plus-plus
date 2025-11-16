@@ -3,7 +3,7 @@ from typing import Optional
 
 import torch
 from sklearn.model_selection import train_test_split
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 from src.utils.paths import Paths
 
@@ -24,11 +24,11 @@ class EmbeddingsDataset(Dataset):
         if ont_hops is not None:
             filename += f"_hops-{ont_hops}"
         if not use_vm:
-            filename += f"_no-vm"
+            filename += "_no-vm"
         if not use_soft_pos:
-            filename += f"_no-sp"
+            filename += "_no-sp"
 
-        self.dir = Paths.repo_root / "data" / "embeddings" / filename
+        self.dir = Paths.embeddings / filename
         self.device = device
         self.length = len(glob.glob(f"{self.dir}/*.pt"))
         self.cache: dict[int, tuple] = {}

@@ -49,4 +49,4 @@ venv
 .idea
 
 data
-results
+output
