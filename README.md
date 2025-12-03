@@ -41,28 +41,28 @@ uv sync
 All entrypoints are located in the `src/entrypoints` directory. Each entrypoint accepts CLI arguments. To view the available cli args for a program, run `python -m [ENTRYPOINT] --help`. These CLI args can for example be used to pick the year of the dataset.
 
 - `preprocess.py`: remove opinions that contain implicit targets and generate embeddings, these embeddings are used
-  by the other programs. To generate all embeddings for a given year, run `python -m src.entrypoints.preprocess --all`
+  by the other programs. To generate all embeddings for a given year, run `python -m lcr.entrypoints.preprocess --all`
 - `hyperparam.py`: run hyperparameter optimization
 - `train.py`: train the model for a given set of hyperparameters
-- `validate.py`: validate a trained model. To do an ablation experiment, run `python -m src.entrypoints.validate --ablation`,
+- `validate.py`: validate a trained model. To do an ablation experiment, run `python -m lcr.entrypoints.validate --ablation`,
   this requires all embeddings to be created for a given year.
 
 Thus, you might execute these commands:
 
 ```shell
-python -m src.entrypoints.preprocess --year 2015 --all
-python -m src.entrypoints.preprocess --year 2015 --phase Train --ont-hops 1
-python -m src.entrypoints.hyperparam --year 2015
-python -m src.entrypoints.hyperparam --year 2015 --val-ont-hops 1
+python -m lcr.entrypoints.preprocess --year 2015 --all
+python -m lcr.entrypoints.preprocess --year 2015 --phase Train --ont-hops 1
+python -m lcr.entrypoints.hyperparam --year 2015
+python -m lcr.entrypoints.hyperparam --year 2015 --val-ont-hops 1
 # The best params for each configuration can be found in the results directory, please edit the training process accordingly
-python -m src.entrypoints.train --year 2015 # Add ont-hops arguments if you want
-python -m src.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH
-python -m src.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH --ablation
+python -m lcr.entrypoints.train --year 2015 # Add ont-hops arguments if you want
+python -m lcr.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH
+python -m lcr.entrypoints.validate --year 2015 --model TRAINED_MODEL_PATH --ablation
 ```
 
 ## Acknowledgements
 
-The `src.model.bert_encoder` module uses code from:
+The `lcr.model.bert_encoder` module uses code from:
 
 - Liu, W., Zhou, P., Zhao, Z., Wang, Z., Ju, Q., Deng, H., Wang, P.: K-BERT: Enabling language representation with
   knowledge graph. In: 34th AAAI Conference on Artificial Intelligence. vol. 34, pp. 2901–2908. AAAI Press (2020)
