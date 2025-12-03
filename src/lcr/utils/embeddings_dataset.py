@@ -5,7 +5,7 @@ import torch
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 
-from src.utils.paths import Paths
+from lcr.utils.paths import Paths
 
 
 class EmbeddingsDataset(Dataset):

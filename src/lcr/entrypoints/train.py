@@ -7,10 +7,10 @@ from torch import nn, optim
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
 
-from src.model import LCRRotHopPlusPlus
-from src.utils import EmbeddingsDataset, train_validation_split
-from src.utils.paths import Paths
-from src.utils.torch import get_torch_device
+from lcr.model import LCRRotHopPlusPlus
+from lcr.utils import EmbeddingsDataset, train_validation_split
+from lcr.utils.paths import Paths
+from lcr.utils.torch import get_torch_device
 
 
 def stringify_float(value: float):

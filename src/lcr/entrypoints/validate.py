@@ -6,9 +6,9 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from src.model import LCRRotHopPlusPlus
-from src.utils import CSVWriter, EmbeddingsDataset
-from src.utils.torch import get_torch_device
+from lcr.model import LCRRotHopPlusPlus
+from lcr.utils import CSVWriter, EmbeddingsDataset
+from lcr.utils.torch import get_torch_device
 
 
 def validate_model(

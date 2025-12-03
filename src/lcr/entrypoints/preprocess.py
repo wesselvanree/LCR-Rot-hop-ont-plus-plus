@@ -8,10 +8,10 @@ import torch
 from rdflib import Graph
 from tqdm import tqdm
 
-from src.model import EmbeddingsLayer
-from src.utils import EmbeddingsDataset, download_from_url
-from src.utils.paths import Paths
-from src.utils.torch import get_torch_device
+from lcr.model import EmbeddingsLayer
+from lcr.utils import EmbeddingsDataset, download_from_url
+from lcr.utils.paths import Paths
+from lcr.utils.torch import get_torch_device
 
 
 def clean_data(year: int, phase: str):

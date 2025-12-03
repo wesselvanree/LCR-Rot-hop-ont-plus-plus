@@ -395,7 +395,7 @@ wheels = [
 [[package]]
 name = "lcr-rot-hop-ont-plus-plus"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "datasets" },
     { name = "matplotlib" },
