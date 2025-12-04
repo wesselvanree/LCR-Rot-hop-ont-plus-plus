@@ -393,7 +393,7 @@ wheels = [
 ]
 
 [[package]]
-name = "lcr-rot-hop-ont-plus-plus"
+name = "lcr"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
