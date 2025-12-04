@@ -38,7 +38,7 @@ uv sync
 
 ### Running scripts
 
-All entrypoints are located in the `src/entrypoints` directory. Each entrypoint accepts CLI arguments. To view the available cli args for a program, run `python -m [ENTRYPOINT] --help`. These CLI args can for example be used to pick the year of the dataset.
+All entrypoints are located in the `src/lcr/entrypoints` directory. Each entrypoint accepts CLI arguments. To view the available cli args for a program, run `python [ENTRYPOINT] --help`. For example, you can use CLI args to pick the year of the dataset.
 
 - `preprocess.py`: remove opinions that contain implicit targets and generate embeddings, these embeddings are used
   by the other programs. To generate all embeddings for a given year, run `python -m lcr.entrypoints.preprocess --all`
