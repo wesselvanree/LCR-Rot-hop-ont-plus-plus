@@ -24,13 +24,7 @@ rename the SemEval datasets to end up with the following files:
 
 ### Installing packages in a virtual environment
 
-This project uses `uv` to manage its dependencies. [Install uv](https://docs.astral.sh/uv/getting-started/installation/) on your local machine. Clone this repository to your local machine, and open a terminal window in this repository. Create a virtual environment using:
-
-```
-uv venv --python 3.11
-```
-
-Then, install packages using
+This project uses `uv` to manage its dependencies. [Install uv](https://docs.astral.sh/uv/getting-started/installation/) on your local machine. Clone this repository to your local machine, and open a terminal window in this repository. Then, install the dependencies in a virtual environment using:
 
 ```
 uv sync
